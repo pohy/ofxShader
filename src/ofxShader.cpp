@@ -260,24 +260,26 @@ out vec4 fragColor;\n";
 #endif
     }
         
+    bool setup = true;
     if ( vertexSrc.size() > 0 ) {
-        setupShaderFromSource( GL_VERTEX_SHADER, version_vert_header + defines_header + vertexSrc );
+        setup &= setupShaderFromSource( GL_VERTEX_SHADER, version_vert_header + defines_header + vertexSrc );
     }
 
     if ( fragmentSrc.size() > 0 ) {
-        setupShaderFromSource( GL_FRAGMENT_SHADER, version_frag_header + defines_header + fragmentSrc );
+        setup &= setupShaderFromSource( GL_FRAGMENT_SHADER, version_frag_header + defines_header + fragmentSrc );
     }
     
 
     #ifndef TARGET_OPENGLES
     if ( geometrySrc.size() > 0 ) {
-        setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, version_geom_header + defines_header + geometrySrc );
+        setup &= setupShaderFromSource( GL_GEOMETRY_SHADER_EXT, version_geom_header + defines_header + geometrySrc );
     }
     #endif
 
     bindDefaults();
         
     bool link = linkProgram();
+    link &= setup;
     ofNotifyEvent(onLoad, link);//, this);
     return link;;
 }
