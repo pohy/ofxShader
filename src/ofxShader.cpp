@@ -1,4 +1,5 @@
 #include "ofxShader.h"
+#include <regex>
 
 ofxShader::ofxShader() {
     m_bWatchingFiles = false;
@@ -198,6 +199,23 @@ void main() {\n\
     }
     defines_header += "#line 0 \n";
     
+    // TODO: Search in src for defined uniforms that are not part of m_uniformsFunctions.
+    //       Handle using a callback? It provides the uniform name, and type.
+    //       The callback can return a UniformFunction, or NULL.
+    //       The uniform function is added into the m_uniformsFunction.
+    //       We should probably keep user supplied uniform functions in a separate vector.
+    //       User defined uniform functions will get purged and reloaded on each reload.
+    //       Offer to load a file for samplers
+
+    std::smatch match;
+    std::regex regex("uniform (\\w+) (\\w+);", std::regex::ECMAScript | std::regex::multiline);
+    std::vector<string> matches;
+    while (std::regex_match(fragmentSrc, match, regex)) {
+        for (auto m : match) {
+            matches.push_back(m.str());
+        }
+    }
+    
     // 2. Check active default uniforms
     for (UniformFunctionsList::iterator it = m_uniformsFunctions.begin(); it != m_uniformsFunctions.end(); ++it) {
         it->second.present = (  _find_id(vertexSrc, it->first.c_str()) != 0 || 
@@ -284,6 +302,10 @@ out vec4 fragColor;\n";
     return link;;
 }
 
+void ofxShader::onUniformParsed(OnUniformParsed onUniformParsed) {
+    this->m_onUniformParsed = onUniformParsed;
+}
+
 std::string ofxShader::getFilename(GLenum _type) {
     switch (_type) {
         case GL_FRAGMENT_SHADER:
@@ -306,6 +328,7 @@ std::string ofxShader::getFilename(GLenum _type) {
 void ofxShader::begin() {
     ofShader::begin();
 
+    // TODO: Process user provided uniform function
     for (UniformFunctionsList::iterator it = m_uniformsFunctions.begin(); it != m_uniformsFunctions.end(); ++it) {
         if (it->second.present) {
             if (it->second.assign) {

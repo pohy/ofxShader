@@ -16,7 +16,15 @@ struct UniformFunction {
     bool                            present = true;
 };
 
+enum UniformType {
+    Float,
+    Vec2,
+    Vec3,
+    Vec4
+};
+
 typedef map<string, UniformFunction> UniformFunctionsList;
+typedef std::function<UniformFunction(string, UniformType)> OnUniformParsed;
 
 class ofxShader : public ofShader {
 public:
@@ -55,6 +63,8 @@ public:
 
     ofEvent<bool>   onLoad;
     ofEvent<bool>   onChange;
+
+    void            onUniformParsed(OnUniformParsed onUniformParsed);
     
 protected:
     void                    _update(ofEventArgs &e);
@@ -63,6 +73,8 @@ protected:
     vector<string>          m_includeFolders;
     
     UniformFunctionsList    m_uniformsFunctions;
+    UniformFunctionsList    m_parsedUniformsFunctions;
+    OnUniformParsed         m_onUniformParsed;
 
     double                  m_lastFrame;
 
