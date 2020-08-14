@@ -55,6 +55,9 @@ public:
 
     ofEvent<bool>   onLoad;
     ofEvent<bool>   onChange;
+
+    void            addUniformFunction(string uniformName, UniformFunction uniformFunction);
+    void            removeUniformFunction(string uniformName);
     
 protected:
     void                    _update(ofEventArgs &e);

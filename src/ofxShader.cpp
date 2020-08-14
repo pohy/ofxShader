@@ -284,6 +284,14 @@ out vec4 fragColor;\n";
     return link;;
 }
 
+
+void ofxShader::addUniformFunction(string uniformName, UniformFunction uniformFunction) {
+    m_uniformsFunctions[uniformName] = uniformFunction;
+}
+
+void ofxShader::removeUniformFunction(string uniformName) {
+    m_uniformsFunctions.erase(uniformName);
+}
 std::string ofxShader::getFilename(GLenum _type) {
     switch (_type) {
         case GL_FRAGMENT_SHADER:
